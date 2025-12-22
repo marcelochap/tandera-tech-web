@@ -31,10 +31,6 @@ Este sistema foi desenvolvido para centralizar a visualização de dados gerados
 
 > **Nota Técnica**: Durante o desenvolvimento, caso a API apresente erro de CORS e você não tenha acesso ao backend, utilize a extensão "Allow CORS" no navegador Chrome para testes locais.
 
-## 📈 Próximos Passos
-- [ ] Implementar visualização para a segunda máquina (Câmera 02).
-- [ ] Conectar os gráficos de histórico diretamente aos endpoints de estatísticas da API.
-- [ ] Implementar sistema de logout real com limpeza de sessão.
 
 ---
 Desenvolvido por **Tandera Tech** - *Inovação em Visão Computacional para a Indústria.*
