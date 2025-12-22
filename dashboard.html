@@ -6,146 +6,29 @@
     <title>Tandera Tech - Dashboard</title>
     <style>
         :root {
-            --primary: #003366; /* Azul Escuro */
-            --secondary: #00ccff; /* Ciano */
-            --bg: #f4f7f9;
-            --white: #ffffff;
-            --danger: #ff4d4d;
-            --success: #2ecc71;
-            --neutral: #888888;
+            --primary: #003366; --secondary: #00ccff; --bg: #f4f7f9;
+            --white: #ffffff; --danger: #ff4d4d; --success: #2ecc71; --neutral: #888888;
         }
-
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: var(--bg); margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            width: 100%;
-            position: relative;
-        }
-
-        .header h2 {
-            color: var(--primary);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .btn-logout {
-            position: absolute;
-            right: 10px;
-            top: 0;
-            background: none;
-            border: 1px solid #ccc;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: var(--primary);
-        }
-
-        /* Grid centralizado */
-        .machine-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 25px;
-            width: 100%;
-            max-width: 1200px;
-        }
-
-        .card {
-            background: var(--white);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            border-top: 6px solid var(--primary);
-            text-align: center;
-            width: 100%;
-            max-width: 380px;
-        }
-
-        .status-img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            display: block;
-            background-color: #eee;
-        }
-
-        .card-content {
-            padding: 20px;
-        }
-
-        .machine-title {
-            font-size: 1.3rem;
-            margin: 0 0 10px 0;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .badge {
-            font-size: 0.75rem;
-            padding: 5px 10px;
-            border-radius: 6px;
-            color: white;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
+        .header { text-align: center; margin-bottom: 30px; width: 100%; position: relative; }
+        .header h2 { color: var(--primary); letter-spacing: 2px; text-transform: uppercase; }
+        .btn-logout { position: absolute; right: 10px; top: 0; background: none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: var(--primary); }
+        .machine-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; width: 100%; max-width: 1200px; }
+        .card { background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-top: 6px solid var(--primary); text-align: center; width: 100%; max-width: 380px; }
+        .status-img { width: 100%; height: 250px; object-fit: cover; display: block; background-color: #eee; }
+        .card-content { padding: 20px; }
+        .machine-title { font-size: 1.3rem; margin: 0 0 10px 0; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; color: white; text-transform: uppercase; font-weight: bold; }
         .good { background-color: var(--success); }
         .bad { background-color: var(--danger); }
         .unknown { background-color: var(--neutral); }
-
-        .timestamp-container {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 15px 0;
-            border: 1px solid #eee;
-        }
-
-        .ts-label {
-            display: block;
-            font-size: 0.7rem;
-            color: #888;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .ts-value {
-            font-size: 0.95rem;
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .btn-history {
-            background-color: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            padding: 12px 25px;
-            border-radius: 30px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            width: 100%;
-            max-width: 200px;
-        }
-
-        .btn-history:hover {
-            background-color: var(--primary);
-            color: white;
-        }
+        .timestamp-container { background-color: #f8f9fa; border-radius: 8px; padding: 12px; margin: 15px 0; border: 1px solid #eee; }
+        .ts-value { font-size: 0.95rem; color: var(--primary); font-weight: 600; }
+        .btn-history { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; max-width: 200px; }
     </style>
 </head>
 <body>
@@ -157,80 +40,61 @@
 
     <div class="machine-grid">
         <div class="card" id="card-m1">
-            <img id="img-m1" src="" alt="Aguardando imagem..." class="status-img">
+            <img id="img-m1" src="" alt="Carregando imagem..." class="status-img">
             <div class="card-content">
-                <h3 class="machine-title">
-                    MÁQUINA 01 
-                    <span id="badge-m1" class="badge unknown">CARREGANDO</span>
-                </h3>
-                
+                <h3 class="machine-title">MÁQUINA 01 <span id="badge-m1" class="badge unknown">...</span></h3>
                 <div class="timestamp-container">
                     <span class="ts-label">ÚLTIMA ATUALIZAÇÃO</span>
                     <span id="time-m1" class="ts-value">--/--/---- --:--:--</span>
                 </div>
-                
                 <button class="btn-history" onclick="window.location.href='historico.html'">Ver Histórico</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Configurações da API Tandera
         const cameraID = "6814d7d7272a9e45300f8252";
         const targetURL = `http://34.95.238.41:3000/blocks/camera/${cameraID}/latest`;
         const imageURL = `http://34.95.238.41:3000/debug-info/image/${cameraID}`;
 
-        // URL do Proxy AllOrigins para resolver erro de CORS
+        // Proxy para os DADOS (JSON)
         const proxyURL = `https://api.allorigins.win/get?url=${encodeURIComponent(targetURL)}`;
 
         async function atualizarDashboard() {
             try {
-                // 1. Busca os dados JSON via Proxy
+                // 1. Busca os DADOS
                 const response = await fetch(proxyURL);
-                if (!response.ok) throw new Error('Falha no Proxy');
-                
                 const wrapper = await response.json();
                 const data = JSON.parse(wrapper.contents);
 
-                // 2. Atualiza a Foto diretamente (tags <img> ignoram bloqueio de CORS de leitura)
+                // 2. Busca a IMAGEM via Proxy (para evitar erro HTTPS/HTTP Mixed Content)
                 const imgElement = document.getElementById('img-m1');
-                imgElement.src = `${imageURL}?t=${new Date().getTime()}`;
+                const rawImgUrl = `${imageURL}?t=${new Date().getTime()}`;
+                imgElement.src = `https://api.allorigins.win/raw?url=${encodeURIComponent(rawImgUrl)}`;
 
-                // 3. Formata a Data/Hora para o padrão brasileiro
-                const dataISO = data.updated;
-                const dataLocal = new Date(dataISO).toLocaleString('pt-BR');
-                document.getElementById('time-m1').innerText = dataLocal;
+                // 3. Atualiza textos
+                document.getElementById('time-m1').innerText = new Date(data.updated).toLocaleString('pt-BR');
 
-                // 4. Lógica de Status (Bom, Ruim ou Incerto)
                 const badge = document.getElementById('badge-m1');
                 const label = data.inferedLabel;
                 const conf = (data.confidance * 100).toFixed(1);
 
                 if (label === "Good" || label === "OK") {
-                    badge.innerText = `BOM (${conf}%)`;
-                    badge.className = "badge good";
+                    badge.innerText = `BOM (${conf}%)`; badge.className = "badge good";
                 } else if (label === "Unknown") {
-                    badge.innerText = `INCERTO (${conf}%)`;
-                    badge.className = "badge unknown";
+                    badge.innerText = `INCERTO (${conf}%)`; badge.className = "badge unknown";
                 } else {
-                    badge.innerText = `RUIM (${conf}%)`;
-                    badge.className = "badge bad";
+                    badge.innerText = `RUIM (${conf}%)`; badge.className = "badge bad";
                 }
 
-                console.log("Sincronização realizada com sucesso!");
-
             } catch (error) {
-                console.error("Erro na comunicação com o servidor:", error);
-                document.getElementById('time-m1').innerText = "Erro: Servidor Offline";
+                console.error("Erro:", error);
+                document.getElementById('time-m1').innerText = "Erro na conexão";
             }
         }
 
-        // Execução imediata
         atualizarDashboard();
-
-        // Atualização em loop a cada 30 segundos
         setInterval(atualizarDashboard, 30000);
     </script>
-
 </body>
 </html>
