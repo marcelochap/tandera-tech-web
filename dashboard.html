@@ -6,8 +6,8 @@
     <title>Tandera Tech - Dashboard</title>
     <style>
         :root {
-            --primary: #003366; /* Azul Escuro */
-            --secondary: #00ccff; /* Ciano */
+            --primary: #003366;
+            --secondary: #00ccff;
             --bg: #f4f7f9;
             --white: #ffffff;
             --danger: #ff4d4d;
@@ -22,12 +22,14 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Centraliza tudo no corpo da página */
+            align-items: center;
         }
 
         .header {
             text-align: center;
             margin-bottom: 30px;
+            width: 100%;
+            position: relative;
         }
 
         .header h2 {
@@ -36,11 +38,22 @@
             text-transform: uppercase;
         }
 
-        /* Grid que centraliza os cards e permite responsividade */
+        .btn-logout {
+            position: absolute;
+            right: 10px;
+            top: 0;
+            background: none;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
         .machine-grid {
             display: flex;
-            flex-wrap: wrap;       /* Quebra linha no celular */
-            justify-content: center; /* Centraliza os cards horizontalmente */
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 25px;
             width: 100%;
             max-width: 1200px;
@@ -54,7 +67,7 @@
             border-top: 6px solid var(--primary);
             text-align: center;
             width: 100%;
-            max-width: 380px; /* Tamanho ideal para leitura no celular */
+            max-width: 380px;
         }
 
         .status-img {
@@ -65,9 +78,7 @@
             background-color: #eee;
         }
 
-        .card-content {
-            padding: 20px;
-        }
+        .card-content { padding: 20px; }
 
         .machine-title {
             font-size: 1.3rem;
@@ -100,14 +111,6 @@
             border: 1px solid #eee;
         }
 
-        .ts-label {
-            display: block;
-            font-size: 0.7rem;
-            color: #888;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
         .ts-value {
             font-size: 0.95rem;
             color: var(--primary);
@@ -136,11 +139,11 @@
 <body>
 
     <div class="header">
+        <button class="btn-logout" onclick="window.location.href='index.html'">Sair</button>
         <h2>Tandera Tech</h2>
     </div>
 
     <div class="machine-grid">
-        
         <div class="card" id="card-m1">
             <img id="img-m1" src="" alt="Aguardando imagem..." class="status-img">
             <div class="card-content">
@@ -148,29 +151,37 @@
                     MÁQUINA 01 
                     <span id="badge-m1" class="badge unknown">CARREGANDO</span>
                 </h3>
-                
                 <div class="timestamp-container">
                     <span class="ts-label">ÚLTIMA ATUALIZAÇÃO</span>
                     <span id="time-m1" class="ts-value">--/--/---- --:--:--</span>
                 </div>
-                
                 <button class="btn-history" onclick="window.location.href='historico.html'">Ver Histórico</button>
             </div>
         </div>
-
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO PROXY REVERSO PARA EVITAR ERRO DE CORS
+        // Utilizamos o serviço 'cors-anywhere' como ponte
+        const proxy = "https://cors-anywhere.herokuapp.com/";
+        
         const cameraID = "6814d7d7272a9e45300f8252";
-        const infoURL = `http://34.95.238.41:3000/blocks/camera/${cameraID}/latest`;
+        const infoURL = `${proxy}http://34.95.238.41:3000/blocks/camera/${cameraID}/latest`;
         const imageURL = `http://34.95.238.41:3000/debug-info/image/${cameraID}`;
 
         async function atualizarDashboard() {
             try {
-                const response = await fetch(infoURL);
+                const response = await fetch(infoURL, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
                 if (!response.ok) throw new Error('Falha na rede');
                 const data = await response.json();
 
+                // Imagens geralmente não precisam de proxy se forem carregadas via tag <img>,
+                // pois o navegador permite o carregamento direto (apenas fetch de dados é bloqueado)
                 const imgElement = document.getElementById('img-m1');
                 imgElement.src = `${imageURL}?t=${new Date().getTime()}`;
 
@@ -193,11 +204,9 @@
                     badge.className = "badge bad";
                 }
 
-                console.log("Dados atualizados com sucesso!");
-
             } catch (error) {
                 console.error("Erro ao carregar dados:", error);
-                document.getElementById('time-m1').innerText = "Erro na conexão";
+                document.getElementById('time-m1').innerText = "Erro: Ative o Proxy";
             }
         }
 
