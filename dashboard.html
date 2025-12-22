@@ -6,8 +6,8 @@
     <title>Tandera Tech - Dashboard</title>
     <style>
         :root {
-            --primary: #003366;
-            --secondary: #00ccff;
+            --primary: #003366; /* Azul Escuro */
+            --secondary: #00ccff; /* Ciano */
             --bg: #f4f7f9;
             --white: #ffffff;
             --danger: #ff4d4d;
@@ -48,8 +48,10 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 0.8rem;
+            color: var(--primary);
         }
 
+        /* Grid centralizado */
         .machine-grid {
             display: flex;
             flex-wrap: wrap;
@@ -78,7 +80,9 @@
             background-color: #eee;
         }
 
-        .card-content { padding: 20px; }
+        .card-content {
+            padding: 20px;
+        }
 
         .machine-title {
             font-size: 1.3rem;
@@ -111,6 +115,14 @@
             border: 1px solid #eee;
         }
 
+        .ts-label {
+            display: block;
+            font-size: 0.7rem;
+            color: #888;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
         .ts-value {
             font-size: 0.95rem;
             color: var(--primary);
@@ -139,7 +151,7 @@
 <body>
 
     <div class="header">
-        <button class="btn-logout" onclick="window.location.href='index.html'">Sair</button>
+        <button class="btn-logout" onclick="window.location.href='index.html'">SAIR</button>
         <h2>Tandera Tech</h2>
     </div>
 
@@ -151,44 +163,45 @@
                     MÁQUINA 01 
                     <span id="badge-m1" class="badge unknown">CARREGANDO</span>
                 </h3>
+                
                 <div class="timestamp-container">
                     <span class="ts-label">ÚLTIMA ATUALIZAÇÃO</span>
                     <span id="time-m1" class="ts-value">--/--/---- --:--:--</span>
                 </div>
+                
                 <button class="btn-history" onclick="window.location.href='historico.html'">Ver Histórico</button>
             </div>
         </div>
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO PROXY REVERSO PARA EVITAR ERRO DE CORS
-        // Utilizamos o serviço 'cors-anywhere' como ponte
-        const proxy = "https://cors-anywhere.herokuapp.com/";
-        
+        // Configurações da API Tandera
         const cameraID = "6814d7d7272a9e45300f8252";
-        const infoURL = `${proxy}http://34.95.238.41:3000/blocks/camera/${cameraID}/latest`;
+        const targetURL = `http://34.95.238.41:3000/blocks/camera/${cameraID}/latest`;
         const imageURL = `http://34.95.238.41:3000/debug-info/image/${cameraID}`;
+
+        // URL do Proxy AllOrigins para resolver erro de CORS
+        const proxyURL = `https://api.allorigins.win/get?url=${encodeURIComponent(targetURL)}`;
 
         async function atualizarDashboard() {
             try {
-                const response = await fetch(infoURL, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
+                // 1. Busca os dados JSON via Proxy
+                const response = await fetch(proxyURL);
+                if (!response.ok) throw new Error('Falha no Proxy');
                 
-                if (!response.ok) throw new Error('Falha na rede');
-                const data = await response.json();
+                const wrapper = await response.json();
+                const data = JSON.parse(wrapper.contents);
 
-                // Imagens geralmente não precisam de proxy se forem carregadas via tag <img>,
-                // pois o navegador permite o carregamento direto (apenas fetch de dados é bloqueado)
+                // 2. Atualiza a Foto diretamente (tags <img> ignoram bloqueio de CORS de leitura)
                 const imgElement = document.getElementById('img-m1');
                 imgElement.src = `${imageURL}?t=${new Date().getTime()}`;
 
+                // 3. Formata a Data/Hora para o padrão brasileiro
                 const dataISO = data.updated;
                 const dataLocal = new Date(dataISO).toLocaleString('pt-BR');
                 document.getElementById('time-m1').innerText = dataLocal;
 
+                // 4. Lógica de Status (Bom, Ruim ou Incerto)
                 const badge = document.getElementById('badge-m1');
                 const label = data.inferedLabel;
                 const conf = (data.confidance * 100).toFixed(1);
@@ -204,13 +217,18 @@
                     badge.className = "badge bad";
                 }
 
+                console.log("Sincronização realizada com sucesso!");
+
             } catch (error) {
-                console.error("Erro ao carregar dados:", error);
-                document.getElementById('time-m1').innerText = "Erro: Ative o Proxy";
+                console.error("Erro na comunicação com o servidor:", error);
+                document.getElementById('time-m1').innerText = "Erro: Servidor Offline";
             }
         }
 
+        // Execução imediata
         atualizarDashboard();
+
+        // Atualização em loop a cada 30 segundos
         setInterval(atualizarDashboard, 30000);
     </script>
 
