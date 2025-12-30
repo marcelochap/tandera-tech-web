@@ -57,28 +57,25 @@
         const targetURL = `http://34.95.238.41:3000/blocks/camera/${cameraID}/latest`;
         const imageURL = `http://34.95.238.41:3000/debug-info/image/${cameraID}`;
 
-        // Proxy para os DADOS (JSON)
-        const proxyURL = `https://api.allorigins.win/get?url=${encodeURIComponent(targetURL)}`;
-
         async function atualizarDashboard() {
             try {
-                // 1. Busca os DADOS
-                const response = await fetch(proxyURL);
-                const wrapper = await response.json();
-                const data = JSON.parse(wrapper.contents);
+                // 1. Busca os DADOS DIRETAMENTE do servidor
+                const response = await fetch(targetURL);
+                if (!response.ok) throw new Error('Falha na resposta do servidor');
+                const data = await response.json();
 
-                // 2. Busca a IMAGEM via Proxy (para evitar erro HTTPS/HTTP Mixed Content)
+                // 2. Busca a IMAGEM DIRETAMENTE do servidor
                 const imgElement = document.getElementById('img-m1');
-                const rawImgUrl = `${imageURL}?t=${new Date().getTime()}`;
-                imgElement.src = `https://api.allorigins.win/raw?url=${encodeURIComponent(rawImgUrl)}`;
+                imgElement.src = `${imageURL}?t=${new Date().getTime()}`;
 
-                // 3. Atualiza textos
+                // 3. Atualiza textos e timestamps
                 document.getElementById('time-m1').innerText = new Date(data.updated).toLocaleString('pt-BR');
 
                 const badge = document.getElementById('badge-m1');
                 const label = data.inferedLabel;
                 const conf = (data.confidance * 100).toFixed(1);
 
+                // Lógica de Status
                 if (label === "Good" || label === "OK") {
                     badge.innerText = `BOM (${conf}%)`; badge.className = "badge good";
                 } else if (label === "Unknown") {
@@ -88,13 +85,14 @@
                 }
 
             } catch (error) {
-                console.error("Erro:", error);
-                document.getElementById('time-m1').innerText = "Erro na conexão";
+                console.error("Erro de conexão:", error);
+                document.getElementById('time-m1').innerText = "Erro na conexão direta";
             }
         }
 
+        // Executa ao carregar e define o intervalo de 20 segundos
         atualizarDashboard();
-        setInterval(atualizarDashboard, 30000);
+        setInterval(atualizarDashboard, 20000);
     </script>
 </body>
 </html>
