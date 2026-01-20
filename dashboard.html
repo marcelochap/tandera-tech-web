@@ -17,8 +17,28 @@
         .header { text-align: center; margin-bottom: 30px; width: 100%; position: relative; }
         .header h2 { color: var(--primary); letter-spacing: 2px; text-transform: uppercase; }
         .btn-logout { position: absolute; right: 10px; top: 0; background: none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: var(--primary); }
-        .machine-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; width: 100%; max-width: 1200px; }
-        .card { background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-top: 6px solid var(--primary); text-align: center; width: 100%; max-width: 380px; }
+        
+        /* Grid responsiva: No celular fica um embaixo do outro, no PC fica lado a lado */
+        .machine-grid { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 25px; 
+            width: 100%; 
+            max-width: 1200px; 
+        }
+        
+        .card { 
+            background: var(--white); 
+            border-radius: 15px; 
+            overflow: hidden; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
+            border-top: 6px solid var(--primary); 
+            text-align: center; 
+            width: 100%; 
+            max-width: 380px; 
+        }
+        
         .status-img { width: 100%; height: 250px; object-fit: cover; display: block; background-color: #eee; }
         .card-content { padding: 20px; }
         .machine-title { font-size: 1.3rem; margin: 0 0 10px 0; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 10px; }
@@ -27,6 +47,7 @@
         .bad { background-color: var(--danger); }
         .unknown { background-color: var(--neutral); }
         .timestamp-container { background-color: #f8f9fa; border-radius: 8px; padding: 12px; margin: 15px 0; border: 1px solid #eee; }
+        .ts-label { display: block; font-size: 0.7rem; color: #888; font-weight: bold; margin-bottom: 4px; }
         .ts-value { font-size: 0.95rem; color: var(--primary); font-weight: 600; }
         .btn-history { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; max-width: 200px; }
     </style>
@@ -39,13 +60,25 @@
     </div>
 
     <div class="machine-grid">
-        <div class="card" id="card-m1">
-            <img id="img-m1" src="" alt="Carregando imagem..." class="status-img">
+        <div class="card" id="card-m3">
+            <img id="img-m3" src="" alt="Carregando Máquina 3..." class="status-img">
             <div class="card-content">
-                <h3 class="machine-title">MÁQUINA 01 <span id="badge-m1" class="badge unknown">...</span></h3>
+                <h3 class="machine-title">MÁQUINA 3 <span id="badge-m3" class="badge unknown">...</span></h3>
                 <div class="timestamp-container">
                     <span class="ts-label">ÚLTIMA ATUALIZAÇÃO</span>
-                    <span id="time-m1" class="ts-value">--/--/---- --:--:--</span>
+                    <span id="time-m3" class="ts-value">--/--/---- --:--:--</span>
+                </div>
+                <button class="btn-history" onclick="window.location.href='historico.html'">Ver Histórico</button>
+            </div>
+        </div>
+
+        <div class="card" id="card-m4">
+            <img id="img-m4" src="" alt="Carregando Máquina 4..." class="status-img">
+            <div class="card-content">
+                <h3 class="machine-title">MÁQUINA 4 <span id="badge-m4" class="badge unknown">...</span></h3>
+                <div class="timestamp-container">
+                    <span class="ts-label">ÚLTIMA ATUALIZAÇÃO</span>
+                    <span id="time-m4" class="ts-value">--/--/---- --:--:--</span>
                 </div>
                 <button class="btn-history" onclick="window.location.href='historico.html'">Ver Histórico</button>
             </div>
@@ -53,46 +86,59 @@
     </div>
 
     <script>
-        const cameraID = "6814d7d7272a9e45300f8252";
-        const targetURL = `http://34.95.238.41:3000/blocks/camera/${cameraID}/latest`;
-        const imageURL = `http://34.95.238.41:3000/debug-info/image/${cameraID}`;
+        // Configurações das Câmeras
+        const maquinas = [
+            { id: "m3", cameraID: "689202d8f0e7455499601cf0" },
+            { id: "m4", cameraID: "6814d7d7272a9e45300f8252" }
+        ];
 
-        async function atualizarDashboard() {
+        const baseURL = "http://34.95.238.41:3000";
+
+        async function fetchMachineData(maquina) {
             try {
-                // 1. Busca os DADOS DIRETAMENTE do servidor
-                const response = await fetch(targetURL);
-                if (!response.ok) throw new Error('Falha na resposta do servidor');
+                const infoURL = `${baseURL}/blocks/camera/${maquina.cameraID}/latest`;
+                const imageURL = `${baseURL}/debug-info/image/${maquina.cameraID}`;
+
+                // 1. Busca Dados
+                const response = await fetch(infoURL);
+                if (!response.ok) throw new Error('Erro na API');
                 const data = await response.json();
 
-                // 2. Busca a IMAGEM DIRETAMENTE do servidor
-                const imgElement = document.getElementById('img-m1');
-                imgElement.src = `${imageURL}?t=${new Date().getTime()}`;
+                // 2. Atualiza Imagem
+                document.getElementById(`img-${maquina.id}`).src = `${imageURL}?t=${new Date().getTime()}`;
 
-                // 3. Atualiza textos e timestamps
-                document.getElementById('time-m1').innerText = new Date(data.updated).toLocaleString('pt-BR');
+                // 3. Atualiza Textos
+                document.getElementById(`time-${maquina.id}`).innerText = new Date(data.updated).toLocaleString('pt-BR');
 
-                const badge = document.getElementById('badge-m1');
+                const badge = document.getElementById(`badge-${maquina.id}`);
                 const label = data.inferedLabel;
                 const conf = (data.confidance * 100).toFixed(1);
 
                 // Lógica de Status
                 if (label === "Good" || label === "OK") {
-                    badge.innerText = `BOM (${conf}%)`; badge.className = "badge good";
+                    badge.innerText = `BOM (${conf}%)`; 
+                    badge.className = "badge good";
                 } else if (label === "Unknown") {
-                    badge.innerText = `INCERTO (${conf}%)`; badge.className = "badge unknown";
+                    badge.innerText = `INCERTO (${conf}%)`; 
+                    badge.className = "badge unknown";
                 } else {
-                    badge.innerText = `RUIM (${conf}%)`; badge.className = "badge bad";
+                    badge.innerText = `RUIM (${conf}%)`; 
+                    badge.className = "badge bad";
                 }
 
             } catch (error) {
-                console.error("Erro de conexão:", error);
-                document.getElementById('time-m1').innerText = "Erro na conexão direta";
+                console.error(`Erro na Máquina ${maquina.id}:`, error);
+                document.getElementById(`time-${maquina.id}`).innerText = "Erro na conexão";
             }
         }
 
-        // Executa ao carregar e define o intervalo de 20 segundos
-        atualizarDashboard();
-        setInterval(atualizarDashboard, 20000);
+        function atualizarTudo() {
+            maquinas.forEach(fetchMachineData);
+        }
+
+        // Execução inicial e intervalo
+        atualizarTudo();
+        setInterval(atualizarTudo, 20000);
     </script>
 </body>
 </html>
