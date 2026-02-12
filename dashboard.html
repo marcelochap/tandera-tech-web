@@ -18,7 +18,6 @@
         .header h2 { color: var(--primary); letter-spacing: 2px; text-transform: uppercase; }
         .btn-logout { position: absolute; right: 10px; top: 0; background: none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: var(--primary); }
         
-        /* Grid responsiva: No celular fica um embaixo do outro, no PC fica lado a lado */
         .machine-grid { 
             display: flex; 
             flex-wrap: wrap; 
@@ -49,7 +48,8 @@
         .timestamp-container { background-color: #f8f9fa; border-radius: 8px; padding: 12px; margin: 15px 0; border: 1px solid #eee; }
         .ts-label { display: block; font-size: 0.7rem; color: #888; font-weight: bold; margin-bottom: 4px; }
         .ts-value { font-size: 0.95rem; color: var(--primary); font-weight: 600; }
-        .btn-history { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; max-width: 200px; }
+        .btn-history { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; max-width: 200px; transition: 0.3s; }
+        .btn-history:hover { background-color: var(--primary); color: white; }
     </style>
 </head>
 <body>
@@ -92,20 +92,22 @@
             { id: "m4", cameraID: "6814d7d7272a9e45300f8252" }
         ];
 
-        const baseURL = "http://34.95.238.41:3000";
+        // URL SEGURA COM SSL E SUBDOMÍNIO
+        const baseURL = "https://api.tanderatech.com.br:3000";
 
         async function fetchMachineData(maquina) {
             try {
                 const infoURL = `${baseURL}/blocks/camera/${maquina.cameraID}/latest`;
                 const imageURL = `${baseURL}/debug-info/image/${maquina.cameraID}`;
 
-                // 1. Busca Dados
+                // 1. Busca Dados (Agora direto via HTTPS)
                 const response = await fetch(infoURL);
                 if (!response.ok) throw new Error('Erro na API');
                 const data = await response.json();
 
                 // 2. Atualiza Imagem
-                document.getElementById(`img-${maquina.id}`).src = `${imageURL}?t=${new Date().getTime()}`;
+                const imgElement = document.getElementById(`img-${maquina.id}`);
+                imgElement.src = `${imageURL}?t=${new Date().getTime()}`;
 
                 // 3. Atualiza Textos
                 document.getElementById(`time-${maquina.id}`).innerText = new Date(data.updated).toLocaleString('pt-BR');
@@ -114,7 +116,6 @@
                 const label = data.inferedLabel;
                 const conf = (data.confidance * 100).toFixed(1);
 
-                // Lógica de Status
                 if (label === "Good" || label === "OK") {
                     badge.innerText = `BOM (${conf}%)`; 
                     badge.className = "badge good";
@@ -128,7 +129,7 @@
 
             } catch (error) {
                 console.error(`Erro na Máquina ${maquina.id}:`, error);
-                document.getElementById(`time-${maquina.id}`).innerText = "Erro na conexão";
+                document.getElementById(`time-${maquina.id}`).innerText = "Servidor Indisponível";
             }
         }
 
@@ -136,9 +137,8 @@
             maquinas.forEach(fetchMachineData);
         }
 
-        // Execução inicial e intervalo
         atualizarTudo();
-        setInterval(atualizarTudo, 20000);
+        setInterval(atualizarTudo, 20000); // Atualiza a cada 20 segundos
     </script>
 </body>
 </html>

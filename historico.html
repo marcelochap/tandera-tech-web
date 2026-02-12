@@ -3,100 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tandera Tech - Histórico</title>
+    <title>Tandera Tech - Histórico Real</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #003366;
-            --secondary: #00ccff;
-            --bg: #f4f7f9;
-            --white: #ffffff;
+            --primary: #003366; --secondary: #00ccff; --bg: #f4f7f9;
+            --white: #ffffff; --danger: #ff4d4d; --success: #2ecc71;
         }
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: var(--bg); margin: 0; padding: 15px;
+            display: flex; flex-direction: column; align-items: center;
         }
 
         .container {
-            width: 100%;
-            max-width: 900px;
-            background: var(--white);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            box-sizing: border-box;
+            width: 100%; max-width: 900px; background: var(--white);
+            padding: 20px; border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1); box-sizing: border-box;
         }
 
-        /* Estilo do Botão Voltar */
         .btn-back {
-            background-color: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-bottom: 20px;
-            transition: 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
+            background-color: transparent; border: 1px solid var(--primary);
+            color: var(--primary); padding: 8px 15px; border-radius: 8px;
+            cursor: pointer; font-weight: bold; margin-bottom: 20px;
+            display: inline-flex; align-items: center; gap: 5px;
+            text-decoration: none; font-size: 0.9rem;
         }
 
-        .btn-back:hover {
-            background-color: var(--primary);
-            color: white;
-        }
+        .btn-back:hover { background-color: var(--primary); color: white; }
 
         h2 { color: var(--primary); text-align: center; margin-top: 0; }
 
-        /* Filtros */
         .filter-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            align-items: flex-end;
-            margin-bottom: 30px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
+            display: flex; flex-wrap: wrap; gap: 10px;
+            justify-content: center; align-items: flex-end;
+            margin-bottom: 30px; padding: 15px;
+            background: #f8f9fa; border-radius: 10px;
         }
 
         .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 140px; }
-        
         label { font-size: 0.75rem; font-weight: bold; color: #555; margin-bottom: 5px; }
 
         input[type="date"] {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-family: inherit;
+            padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;
         }
 
         .btn-filter {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
+            background: var(--primary); color: white; border: none;
+            padding: 12px 25px; border-radius: 6px;
+            cursor: pointer; font-weight: bold; transition: 0.2s;
         }
 
-        .btn-filter:hover { background: #002244; }
+        .btn-filter:disabled { background: #ccc; cursor: not-allowed; }
 
-        .chart-wrapper {
-            position: relative;
-            height: 60vh;
-            width: 100%;
+        .chart-wrapper { position: relative; height: 60vh; width: 100%; }
+
+        #loading {
+            display: none; text-align: center; color: var(--primary);
+            font-weight: bold; margin-bottom: 10px; font-size: 0.9rem;
         }
     </style>
 </head>
@@ -118,8 +83,10 @@
                 <label>FIM</label>
                 <input type="date" id="endDate">
             </div>
-            <button class="btn-filter" onclick="executarFiltro()">FILTRAR</button>
+            <button id="btnFiltrar" class="btn-filter" onclick="executarFiltro()">FILTRAR</button>
         </div>
+
+        <div id="loading">Consultando dados seguros no servidor...</div>
 
         <div class="chart-wrapper">
             <canvas id="productionChart"></canvas>
@@ -128,18 +95,13 @@
 
     <script>
         let meuGrafico;
-
-        function formatarDataBR(dataStr) {
-            const partes = dataStr.split('-');
-            return `${partes[2]}/${partes[1]}`;
-        }
+        // Atualizado para o seu subdomínio seguro com HTTPS
+        const cameraId = "6814d7d7272a9e45300f8252";
+        const serverURL = "https://api.tanderatech.com.br:3000";
 
         function inicializarOuAtualizarGrafico(labels, dadosBoas, dadosTotais) {
             const ctx = document.getElementById('productionChart').getContext('2d');
-
-            if (meuGrafico) {
-                meuGrafico.destroy();
-            }
+            if (meuGrafico) meuGrafico.destroy();
 
             meuGrafico = new Chart(ctx, {
                 type: 'line',
@@ -151,72 +113,113 @@
                             data: dadosBoas,
                             backgroundColor: 'rgba(0, 51, 102, 0.7)', 
                             borderColor: 'rgba(0, 51, 102, 1)',
-                            fill: true,
-                            tension: 0,
-                            pointRadius: 4
+                            fill: true, tension: 0, pointRadius: 4
                         },
                         {
                             label: 'Total Produzido',
                             data: dadosTotais,
                             backgroundColor: 'rgba(255, 77, 77, 0.7)', 
                             borderColor: 'rgba(255, 77, 77, 1)',
-                            fill: '-1',
-                            tension: 0,
-                            pointRadius: 4
+                            fill: '-1', tension: 0, pointRadius: 4
                         }
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { 
                         y: { 
-                            beginAtZero: true,
-                            title: { display: true, text: 'Qtd Placas' }
-                        }
+                            beginAtZero: true, 
+                            title: { display: true, text: 'Quantidade de Placas' } 
+                        } 
                     },
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    }
+                    plugins: { legend: { position: 'bottom' } }
                 }
             });
         }
 
-        function executarFiltro() {
+        async function consultarDia(dataIso) {
+            // Formata as datas com o sufixo de fuso horário solicitado
+            const startStr = `${dataIso}T00:00:00[-03:00]`;
+            const endStr = `${dataIso}T23:59:59[-03:00]`;
+            
+            // Monta a URL usando o endpoint summary com HTTPS
+            const url = `${serverURL}/blocks/camera/${cameraId}/date-range/summary?start=${encodeURIComponent(startStr)}&end=${encodeURIComponent(endStr)}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Falha na resposta do servidor');
+                const data = await response.json();
+                
+                return {
+                    label: dataIso.split('-').reverse().slice(0,2).join('/'), 
+                    boas: parseInt(data.goodBlocksCount) || 0,
+                    total: parseInt(data.blocksCount) || 0
+                };
+            } catch (error) {
+                console.error("Erro na data " + dataIso, error);
+                return { 
+                    label: dataIso.split('-').reverse().slice(0,2).join('/'), 
+                    boas: 0, 
+                    total: 0 
+                };
+            }
+        }
+
+        async function executarFiltro() {
             const dataInicioStr = document.getElementById('startDate').value;
             const dataFimStr = document.getElementById('endDate').value;
 
             if (!dataInicioStr || !dataFimStr) {
-                alert("Por favor, selecione as duas datas.");
+                alert("Por favor, selecione as datas de início e fim.");
                 return;
             }
 
-            const dataInicio = new Date(dataInicioStr + "T00:00:00");
-            const dataFim = new Date(dataFimStr + "T00:00:00");
-
-            if (dataFim < dataInicio) {
-                alert("A data final não pode ser menor que a inicial.");
-                return;
-            }
+            const loading = document.getElementById('loading');
+            const btn = document.getElementById('btnFiltrar');
+            
+            loading.style.display = 'block';
+            btn.disabled = true;
 
             const labels = [];
             const dadosBoas = [];
             const dadosTotais = [];
-            
-            let dataAtual = new Date(dataInicio);
+            const promessas = [];
+
+            let dataAtual = new Date(dataInicioStr + "T00:00:00");
+            const dataFim = new Date(dataFimStr + "T00:00:00");
+
+            if (dataFim < dataAtual) {
+                alert("A data final não pode ser menor que a inicial.");
+                loading.style.display = 'none';
+                btn.disabled = false;
+                return;
+            }
+
+            // Loop para coletar dados dia a dia
             while (dataAtual <= dataFim) {
-                labels.push(dataAtual.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'}));
-                
-                let boas = Math.floor(Math.random() * (200 - 100) + 1000);
-                let totais = boas + Math.floor(Math.random() * 300);
-                
-                dadosBoas.push(boas);
-                dadosTotais.push(totais);
-                
+                const dataIso = dataAtual.toISOString().split('T')[0];
+                promessas.push(consultarDia(dataIso));
                 dataAtual.setDate(dataAtual.getDate() + 1);
             }
 
-            inicializarOuAtualizarGrafico(labels, dadosBoas, dadosTotais);
+            try {
+                // Execução paralela para alta performance
+                const resultados = await Promise.all(promessas);
+
+                resultados.forEach(res => {
+                    labels.push(res.label);
+                    dadosBoas.push(res.boas);
+                    dadosTotais.push(res.total);
+                });
+
+                inicializarOuAtualizarGrafico(labels, dadosBoas, dadosTotais);
+            } catch (err) {
+                console.error("Erro ao buscar histórico:", err);
+                alert("Erro ao conectar com o servidor seguro.");
+            } finally {
+                loading.style.display = 'none';
+                btn.disabled = false;
+            }
         }
 
         window.onload = () => {
