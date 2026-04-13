@@ -1,50 +1,50 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- 
+SYNC IMPACT REPORT
+Version change: 0.0.0 → 1.0.0
+Modified principles: None (Initial Setup)
+Added sections: Core Principles, Technical Constraints, Development Workflow
+Removed sections: None
+Templates requiring updates: 
+- ✅ .specify/templates/plan-template.md
+- ✅ .specify/templates/spec-template.md
+- ✅ .specify/templates/tasks-template.md
+Follow-up TODOs: None
+-->
+
+# Projeto Frontend Tandera Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Google-First Identity
+Authentication MUST prioritize Google OAuth2.0 to ensure a frictionless "One-Tap" login experience for users. Manual registration should be secondary or omitted if the template allows.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Template Consistency
+The UI MUST strictly follow the existing webapp template's design system. Any additions (like login buttons or user profiles) MUST feel native to the aesthetic, using curated color palettes and smooth transitions.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Visual Excellence (Antigravity Standard)
+Every interaction MUST feel premium. Use vibrant gradients, glassmorphism, and subtle micro-animations (e.g., hover states on login buttons) to "wow" the user at first glance. No generic browser defaults.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Secure Token Management
+Identity tokens and session data MUST be handled securely. Sensitive credentials should never be exposed in client-side logs or insecure storage. Use standard JWT and OAuth practices.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Progressive Enhancement & Fallbacks
+While Google Login is primary, the system SHOULD handle authentication failures gracefully with clear, user-friendly error messages that match the project's visual theme.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Technical Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- **Frontend**: Vanilla HTML/JavaScript/CSS (as per root instructions).
+- **Identity**: Google Identity Services SDK.
+- **Styling**: Modern CSS with CSS Variables for theme consistency.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- All features follow the Spec-Driven Development (SDD) process: Constitution → Specification → Plan → Tasks → Implementation.
+- Each phase requires validation against this Constitution before proceeding to the next.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- This Constitution supersedes ad-hoc development decisions.
+- Amendments require a version bump and updates to all templates.
+- PRs MUST be reviewed for consistency with Visual Excellence and Google-First principles.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-04-13 | **Last Amended**: 2026-04-13
