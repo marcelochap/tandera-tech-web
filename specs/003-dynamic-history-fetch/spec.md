@@ -22,21 +22,8 @@ Como um operador de fábrica, ao clicar no botão "Ver Histórico" de uma máqui
 
 ---
 
-### User Story 2 - Carregamento via Parâmetros de URL (Priority: P2)
 
-Como um usuário avançado, quero poder compartilhar ou marcar como favorito links diretos para o histórico de uma câmera específica, para que eu possa pular as etapas de login/dashboard quando a sessão já estiver ativa.
-
-**Why this priority**: Melhora a usabilidade e permite integrações futuras mais simples.
-
-**Independent Test**: Abrir manualmente uma URL de histórico com parâmetros válidos e verificar se a página carrega os dados corretamente.
-
-**Acceptance Scenarios**:
-
-1. **Given** que o usuário tem uma sessão válida (Token e ServerIp salvos), **When** acessa `historico.html?camera=[ID_VALIDO]`, **Then** o sistema extrai o ID e busca os dados no servidor remoto.
-
----
-
-### User Story 3 - Fallback para Câmera Padrão (Priority: P3)
+### User Story 2 - Fallback para Câmera Padrão (Priority: P2)
 
 Como um sistema robusto, se eu acessar a página de histórico sem nenhum parâmetro na URL, o sistema deve tentar carregar a primeira câmera disponível no cache da sessão, para evitar uma tela de erro ou um gráfico vazio.
 

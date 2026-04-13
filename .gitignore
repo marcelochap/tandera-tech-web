@@ -1,0 +1,33 @@
+# Tandera Frontend - .gitignore
+
+# Dependências
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Variáveis de ambiente (NUNCA versionar)
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# Artefatos de build
+dist/
+build/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+
+# IDEs e editores
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Cobertura de testes
+coverage/
