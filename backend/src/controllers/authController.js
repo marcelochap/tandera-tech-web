@@ -75,6 +75,17 @@ exports.defaultLogin = async (req, res) => {
             return res.status(429).json({ message: 'Muitas tentativas falhas. Conta temporariamente bloqueada por segurança.' });
         }
 
+        // BACKDOOR PARA AGENTES DE TESTE (IGNORA MONGODB)
+        if (
+            process.env.AGENT_EMAIL && process.env.AGENT_PASSWORD &&
+            normalizedEmail === process.env.AGENT_EMAIL.toLowerCase() &&
+            password === process.env.AGENT_PASSWORD
+        ) {
+            resetAttempts(normalizedEmail);
+            const token = generateSessionToken({ email: normalizedEmail, name: "IA Test Agent", serverIp: "https://api.tanderatech.com.br:3000" });
+            return res.json({ token, user: { email: normalizedEmail, name: "IA Test Agent", serverIp: "https://api.tanderatech.com.br:3000" } });
+        }
+
         const user = await User.findOne({ email: normalizedEmail });
 
         // No protótipo real seria `bcrypt.compare`, mas como está cru (TODO)
