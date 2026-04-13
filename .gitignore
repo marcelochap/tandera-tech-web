@@ -1,13 +1,14 @@
 # Tandera Frontend - .gitignore
 
-# Dependências
+# Dependências (raiz + backend)
 node_modules/
+backend/node_modules/
 
 # Logs
 *.log
 npm-debug.log*
 
-# Variáveis de ambiente (NUNCA versionar)
+# Variáveis de ambiente (NUNCA versionar - configurar na Vercel Dashboard)
 .env
 .env.local
 .env.*.local
