@@ -62,6 +62,22 @@ As a multi-tenant client, I want my dashboard to connect to my specific server i
 
 1. **Given** a successful login, **When** the user is redirected, **Then** the application context contains the correct Server IP for that specific user ID.
 
+---
+
+### User Story 5 - Baseline Security Protections (Priority: P1)
+
+As a user and administrator, I want the login process to be protected against basic vulnerabilities so that my credentials and the system are safe.
+
+**Why this priority**: Minimum security is essential even for prototypes to establish good practices and prevent trivial exploitation.
+
+**Independent Test**: Verify that input fields sanitize HTML tags. Verify that passwords are treated as sensitive fields (masked). Verify that after a certain number of failed traditional login attempts, the UI displays a warning or throttles the mechanism (simulated rate limiting).
+
+**Acceptance Scenarios**:
+
+1. **Given** a user attempting to log in, **When** they type in the password field, **Then** the characters are masked.
+2. **Given** an attacker trying to inject script tags into the username field, **When** the form is submitted, **Then** the script is sanitized or rejected.
+3. **Given** multiple consecutive failed login attempts, **When** the internal threshold is reached, **Then** the system visually throttles or blocks further immediate attempts.
+
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
@@ -72,6 +88,9 @@ As a multi-tenant client, I want my dashboard to connect to my specific server i
 - **FR-004**: Upon successful login, the system MUST store the session and the assigned Server IP in `sessionStorage`.
 - **FR-005**: Both `dashboard.html` and `historico.html` MUST be updated to fetch the `baseURL` from the session context instead of using a hardcoded value.
 - **FR-006**: A "Logout" action MUST clear all session data and redirect to `index.html`.
+- **FR-007**: All authentication functionality MUST enforce HTTPS in any deployed environment to prevent credential interception.
+- **FR-008**: The login form MUST implement basic input sanitization to prevent Cross-Site Scripting (XSS).
+- **FR-009**: The email/password login MUST implement a minimum client-side artificial delay or lockout after 3 consecutive failed attempts to mitigate basic brute-force attacks on the prototype.
 
 ### Key Entities
 
@@ -90,5 +109,5 @@ As a multi-tenant client, I want my dashboard to connect to my specific server i
 
 - **Mock Mapping**: For the initial implementation, the user mapping will be a local JSON dictionary until a proper backend registry is provided.
 - **Google Client ID**: A placeholder Google Client ID will be used until the user provides a production one.
-- **Security**: For this prototype, `sessionStorage` is sufficient for demoing the redirection logic.
+- **Security Context**: For this prototype, `sessionStorage` will be used for storing the token/mapping to demo the flow, but it is acknowledged that production should move sensitive tokens to `HTTP-only` cookies. The backend will eventually handle actual rate limiting, but the frontend will simulate it for now.
 - **Data Fidelity**: All target server IPs expose the same API schema as defined in the current `dashboard.html`.
