@@ -88,13 +88,57 @@
             text-decoration: none;
             display: block;
         }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #888;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        .divider:not(:empty)::before { margin-right: .25em; }
+        .divider:not(:empty)::after { margin-left: .25em; }
+
+        .google-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
     </style>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
     <div class="login-card">
         <span class="logo-placeholder">TANDERA TECH</span>
         
+        <!-- GOOGLE ONE TAP -->
+        <!-- IMPORTANTE: Substitua SEU_CLIENT_ID_AQUI pelo valor do Google Cloud Console -->
+        <div id="g_id_onload"
+             data-client_id="SEU_CLIENT_ID_AQUI.apps.googleusercontent.com"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+
+        <div class="google-btn-container">
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-shape="rectangular"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-size="large"
+                 data-logo_alignment="center">
+            </div>
+        </div>
+
+        <div class="divider">ou</div>
+
         <form id="loginForm">
             <div class="input-group">
                 <label for="user">Usuário</label>
@@ -113,17 +157,56 @@
     </div>
 
     <script>
-        function testarLogin() {
-            const usuarioInformado = document.getElementById('user').value;
-            const senhaInformada = document.getElementById('password').value;
+        const AUTH_API_URL = 'http://localhost:3001/api/auth';
 
-            // Teste de credenciais: adm / SenhaTandera2025
-            if (usuarioInformado === 'adm' && senhaInformada === 'SenhaTandera2025') {
-                // Se correto, redireciona para a página dashboard
+        // Lida com a resposta comum das rotas de auth
+        async function processLoginResponse(response) {
+            if (response.ok) {
+                const data = await response.json();
+                // Salvar Token e IP do servidor específicos do usuário no Storage da Sessão
+                sessionStorage.setItem('tandera_token', data.token);
+                sessionStorage.setItem('tandera_serverIp', data.user.serverIp);
                 window.location.href = 'dashboard.html';
             } else {
-                // Se errado, avisa o usuário
-                alert('Usuário ou senha incorretos. Tente novamente.');
+                const error = await response.json();
+                alert(error.message || 'Falha na autenticação.');
+            }
+        }
+
+        // Callback invocado automaticamente pelo botão do Google
+        async function handleCredentialResponse(response) {
+            try {
+                const res = await fetch(`${AUTH_API_URL}/google`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential })
+                });
+                await processLoginResponse(res);
+            } catch (err) {
+                console.error(err);
+                alert('Erro de conexão com o servidor de autenticação (Node não iniciado).');
+            }
+        }
+
+        // Login Tradicional (E-mail / Senha)
+        async function testarLogin() {
+            const emailInformado = document.getElementById('user').value;
+            const senhaInformada = document.getElementById('password').value;
+
+            if (!emailInformado || !senhaInformada) {
+                return alert('Por favor, preencha e-mail e senha.');
+            }
+
+            try {
+                const res = await fetch(`${AUTH_API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailInformado, password: senhaInformada })
+                });
+                await processLoginResponse(res);
+            } catch (err) {
+                console.error(err);
+                alert('Erro de conexão com o servidor de autenticação (Node não iniciado).');
             }
         }
     </script>

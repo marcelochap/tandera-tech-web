@@ -94,10 +94,21 @@
     </div>
 
     <script>
+        // 1. Verificação de Segurança OBRIGATÓRIA
+        const token = sessionStorage.getItem('tandera_token');
+        const userServerIp = sessionStorage.getItem('tandera_serverIp');
+
+        if (!token || !userServerIp) {
+            // Se não tem login válido salvo, volta pro login
+            window.location.replace('index.html');
+        }
+
         let meuGrafico;
-        // Atualizado para o seu subdomínio seguro com HTTPS
+        // Câmera Atualizada 
         const cameraId = "6814d7d7272a9e45300f8252";
-        const serverURL = "https://api.tanderatech.com.br:3000";
+
+        // URL SEGURA DINÂMICA (Baseada no Mapeamento do MongoDB p/ Cada Cliente)
+        const serverURL = userServerIp;
 
         function inicializarOuAtualizarGrafico(labels, dadosBoas, dadosTotais) {
             const ctx = document.getElementById('productionChart').getContext('2d');

@@ -55,7 +55,7 @@
 <body>
 
     <div class="header">
-        <button class="btn-logout" onclick="window.location.href='index.html'">SAIR</button>
+        <button class="btn-logout" onclick="fazerLogout()">SAIR</button>
         <h2>Tandera Tech</h2>
     </div>
 
@@ -86,14 +86,28 @@
     </div>
 
     <script>
-        // Configurações das Câmeras
+        // 1. Verificação de Segurança OBRIGATÓRIA
+        const token = sessionStorage.getItem('tandera_token');
+        const userServerIp = sessionStorage.getItem('tandera_serverIp');
+
+        if (!token || !userServerIp) {
+            // Se não tem login válido salvo, joga para o login
+            window.location.replace('index.html');
+        }
+
+        function fazerLogout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // Configurações das Câmeras (Hardcoded por enquanto)
         const maquinas = [
             { id: "m3", cameraID: "689202d8f0e7455499601cf0" },
             { id: "m4", cameraID: "6814d7d7272a9e45300f8252" }
         ];
 
-        // URL SEGURA COM SSL E SUBDOMÍNIO
-        const baseURL = "https://api.tanderatech.com.br:3000";
+        // URL SEGURA DINÂMICA (Baseada no Mapeamento do MongoDB p/ Cada Cliente)
+        const baseURL = userServerIp;
 
         async function fetchMachineData(maquina) {
             try {
