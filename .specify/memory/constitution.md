@@ -16,7 +16,7 @@ Follow-up TODOs: None
 ## Core Principles
 
 ### I. Google-First Identity
-Authentication MUST prioritize Google OAuth2.0 to ensure a frictionless "One-Tap" login experience for users. Manual registration should be secondary or omitted if the template allows.
+Authentication MUST prioritize Google OAuth2.0 to ensure a frictionless "One-Tap" login experience for users. Manual registration should be secondary.
 
 ### II. Template Consistency
 The UI MUST strictly follow the existing webapp template's design system. Any additions (like login buttons or user profiles) MUST feel native to the aesthetic, using curated color palettes and smooth transitions.

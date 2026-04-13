@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tandera Tech - Histórico Real</title>
+    <title>Tandera Tech - Histórico de Produção</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -72,7 +72,7 @@
             ← Voltar para Início
         </button>
 
-        <h2>Produção Tandera Tech</h2>
+        <h2 id="pageTitulo">Produção Tandera Tech</h2>
 
         <div class="filter-section">
             <div class="filter-group">
@@ -94,10 +94,75 @@
     </div>
 
     <script>
+        // =====================================================
+        // FASE 1 - VERIFICAÇÃO DE SEGURANÇA (OBRIGATÓRIA)
+        // =====================================================
+        const token = sessionStorage.getItem('tandera_token');
+        const userServerIp = sessionStorage.getItem('tandera_serverIp');
+
+        if (!token || !userServerIp) {
+            // Sem sessão válida: retorna para login
+            window.location.replace('index.html');
+        }
+
+        // =====================================================
+        // FASE 2 - RESOLUÇÃO DINÂMICA DA CÂMERA ALVO
+        // =====================================================
+
+        // Leitura dos parâmetros da URL (passados pelo botão "Ver Histórico" no dashboard)
+        const urlParams = new URLSearchParams(window.location.search);
+        let cameraId = urlParams.get('camera');
+        let cameraNome = urlParams.get('name') ? decodeURIComponent(urlParams.get('name')) : null;
+
+        // FALLBACK: Se a URL não trouxer o ID, tenta recuperar a primeira câmera do cache de sessão
+        if (!cameraId) {
+            try {
+                const cacheRaw = sessionStorage.getItem('tandera_cameras');
+                if (cacheRaw) {
+                    // Replicação da cifra XOR usada no dashboard para descriptografar o cache
+                    const CHAVE_SECRETA = token.substring(token.length - 12);
+
+                    function xorCipherD(hash) {
+                        const decoded = decodeURIComponent(atob(hash));
+                        let res = '';
+                        for (let i = 0; i < decoded.length; i++) {
+                            res += String.fromCharCode(decoded.charCodeAt(i) ^ CHAVE_SECRETA.charCodeAt(i % CHAVE_SECRETA.length));
+                        }
+                        return res;
+                    }
+
+                    const cameras = JSON.parse(xorCipherD(cacheRaw));
+                    if (cameras && cameras.length > 0) {
+                        cameraId = cameras[0]._id;
+                        cameraNome = cameras[0].name;
+                        console.log(`[Historico] Fallback: usando câmera padrão "${cameraNome}" (${cameraId})`);
+                    }
+                }
+            } catch (e) {
+                console.warn('[Historico] Falha ao ler cache de câmeras:', e);
+            }
+        }
+
+        // BARREIRA FINAL: Se mesmo com o fallback não tiver câmera, redireciona para o dashboard
+        if (!cameraId) {
+            alert('Acesso Restrito: Nenhuma câmera encontrada. Retornando ao painel.');
+            window.location.replace('dashboard.html');
+        }
+
+        // =====================================================
+        // FASE 3 - CONFIGURAÇÃO DA PÁGINA
+        // =====================================================
+
+        // Atualiza o título com o nome da câmera selecionada
+        const nomeTitulo = cameraNome ? cameraNome.toUpperCase() : 'MÁQUINA';
+        document.getElementById('pageTitulo').innerText = `Produção — ${nomeTitulo}`;
+
+        const serverURL = userServerIp;
         let meuGrafico;
-        // Atualizado para o seu subdomínio seguro com HTTPS
-        const cameraId = "6814d7d7272a9e45300f8252";
-        const serverURL = "https://api.tanderatech.com.br:3000";
+
+        // =====================================================
+        // FASE 4 - LÓGICA DE FETCH E GRÁFICO
+        // =====================================================
 
         function inicializarOuAtualizarGrafico(labels, dadosBoas, dadosTotais) {
             const ctx = document.getElementById('productionChart').getContext('2d');
@@ -111,14 +176,14 @@
                         {
                             label: 'Placas Boas',
                             data: dadosBoas,
-                            backgroundColor: 'rgba(0, 51, 102, 0.7)', 
+                            backgroundColor: 'rgba(0, 51, 102, 0.7)',
                             borderColor: 'rgba(0, 51, 102, 1)',
                             fill: true, tension: 0, pointRadius: 4
                         },
                         {
                             label: 'Total Produzido',
                             data: dadosTotais,
-                            backgroundColor: 'rgba(255, 77, 77, 0.7)', 
+                            backgroundColor: 'rgba(255, 77, 77, 0.7)',
                             borderColor: 'rgba(255, 77, 77, 1)',
                             fill: '-1', tension: 0, pointRadius: 4
                         }
@@ -126,11 +191,11 @@
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    scales: { 
-                        y: { 
-                            beginAtZero: true, 
-                            title: { display: true, text: 'Quantidade de Placas' } 
-                        } 
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Quantidade de Placas' }
+                        }
                     },
                     plugins: { legend: { position: 'bottom' } }
                 }
@@ -138,29 +203,29 @@
         }
 
         async function consultarDia(dataIso) {
-            // Formata as datas com o sufixo de fuso horário solicitado
+            // Formata as datas com o sufixo de fuso horário solicitado pela API
             const startStr = `${dataIso}T00:00:00[-03:00]`;
             const endStr = `${dataIso}T23:59:59[-03:00]`;
-            
-            // Monta a URL usando o endpoint summary com HTTPS
+
+            // URL dinâmica usando o cameraId resolvido no início do script
             const url = `${serverURL}/blocks/camera/${cameraId}/date-range/summary?start=${encodeURIComponent(startStr)}&end=${encodeURIComponent(endStr)}`;
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Falha na resposta do servidor');
                 const data = await response.json();
-                
+
                 return {
-                    label: dataIso.split('-').reverse().slice(0,2).join('/'), 
+                    label: dataIso.split('-').reverse().slice(0, 2).join('/'),
                     boas: parseInt(data.goodBlocksCount) || 0,
                     total: parseInt(data.blocksCount) || 0
                 };
             } catch (error) {
                 console.error("Erro na data " + dataIso, error);
-                return { 
-                    label: dataIso.split('-').reverse().slice(0,2).join('/'), 
-                    boas: 0, 
-                    total: 0 
+                return {
+                    label: dataIso.split('-').reverse().slice(0, 2).join('/'),
+                    boas: 0,
+                    total: 0
                 };
             }
         }
@@ -176,7 +241,7 @@
 
             const loading = document.getElementById('loading');
             const btn = document.getElementById('btnFiltrar');
-            
+
             loading.style.display = 'block';
             btn.disabled = true;
 
@@ -229,7 +294,7 @@
 
             document.getElementById('startDate').value = semanaPassada.toISOString().split('T')[0];
             document.getElementById('endDate').value = hoje.toISOString().split('T')[0];
-            
+
             executarFiltro();
         };
     </script>
