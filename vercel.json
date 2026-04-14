@@ -1,27 +1,9 @@
 {
-  "version": 2,
-  "builds": [
+  "cleanUrls": true,
+  "rewrites": [
     {
-      "src": "backend/src/server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "backend/src/server.js"
-    },
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/(dashboard|historico|index)\\.html",
-      "dest": "/$1.html"
-    },
-    {
-      "src": "/(.*\\.html)",
-      "dest": "/$1"
+      "source": "/api/(.*)",
+      "destination": "/api"
     }
   ]
 }
