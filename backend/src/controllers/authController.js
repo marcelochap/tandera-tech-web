@@ -103,3 +103,14 @@ exports.defaultLogin = async (req, res) => {
         res.status(500).json({ message: 'Erro interno no servidor.' });
     }
 };
+
+exports.getServers = async (req, res) => {
+    try {
+        const users = await User.find({}, 'name email serverIp').lean();
+        res.json(users);
+    } catch (error) {
+        console.error('Erro ao listar servidores:', error);
+        res.status(500).json({ message: 'Erro ao carregar lista de servidores.' });
+    }
+};
+
