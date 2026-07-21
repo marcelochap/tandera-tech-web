@@ -1,144 +1,341 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tandera Tech - Dashboard</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <style>
         :root {
-            --primary: #003366; --secondary: #00ccff; --bg: #f4f7f9;
-            --white: #ffffff; --danger: #ff4d4d; --success: #2ecc71; --neutral: #888888;
+            --primary: #003366;
+            --secondary: #00ccff;
+            --bg: #f4f7f9;
+            --white: #ffffff;
+            --danger: #ff4d4d;
+            --success: #2ecc71;
+            --neutral: #888888;
         }
+
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg); margin: 0; padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .header { text-align: center; margin-bottom: 30px; width: 100%; position: relative; }
-        .header h2 { color: var(--primary); letter-spacing: 2px; text-transform: uppercase; }
-        .btn-logout { position: absolute; right: 10px; top: 0; background: none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: var(--primary); }
-        
-        .machine-grid { 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: center; 
-            gap: 25px; 
-            width: 100%; 
-            max-width: 1200px; 
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            position: relative;
         }
-        
-        .card { 
-            background: var(--white); 
-            border-radius: 15px; 
-            overflow: hidden; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
-            border-top: 6px solid var(--primary); 
-            text-align: center; 
-            width: 100%; 
-            max-width: 380px; 
+
+        .header h2 {
+            color: var(--primary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
-        
-        .status-img { width: 100%; height: 250px; object-fit: cover; display: block; background-color: #eee; }
-        .card-content { padding: 20px; }
-        .machine-title { font-size: 1.3rem; margin: 0 0 10px 0; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; color: white; text-transform: uppercase; font-weight: bold; }
-        .good { background-color: var(--success); }
-        .bad { background-color: var(--danger); }
-        .unknown { background-color: var(--neutral); }
-        .timestamp-container { background-color: #f8f9fa; border-radius: 8px; padding: 12px; margin: 15px 0; border: 1px solid #eee; }
-        .ts-label { display: block; font-size: 0.7rem; color: #888; font-weight: bold; margin-bottom: 4px; }
-        .ts-value { font-size: 0.95rem; color: var(--primary); font-weight: 600; }
-        .btn-history { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; max-width: 200px; transition: 0.3s; }
-        .btn-history:hover { background-color: var(--primary); color: white; }
+
+        .btn-logout {
+            position: absolute;
+            right: 10px;
+            top: 0;
+            background: none;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        .btn-monitor {
+            position: absolute;
+            left: 10px;
+            top: 0;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-monitor:hover {
+            background-color: var(--secondary);
+            color: #000;
+        }
+
+        .machine-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border-top: 6px solid var(--primary);
+            text-align: center;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .status-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            background-color: #eee;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .machine-title {
+            font-size: 1.3rem;
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            border-radius: 6px;
+            color: white;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .good {
+            background-color: var(--success);
+        }
+
+        .bad {
+            background-color: var(--danger);
+        }
+
+        .unknown {
+            background-color: var(--neutral);
+        }
+
+        .timestamp-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #eee;
+        }
+
+        .ts-label {
+            display: block;
+            font-size: 0.7rem;
+            color: #888;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .ts-value {
+            font-size: 0.95rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .btn-history {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            max-width: 200px;
+            transition: 0.3s;
+        }
+
+        .btn-history:hover {
+            background-color: var(--primary);
+            color: white;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="header">
-        <button class="btn-logout" onclick="window.location.href='index.html'">SAIR</button>
+        <button class="btn-monitor" onclick="window.location.href='monitoramento.html'">📷 Monitorar Câmeras</button>
+        <button class="btn-logout" onclick="fazerLogout()">SAIR</button>
         <h2>Tandera Tech</h2>
     </div>
 
-    <div class="machine-grid">
-        <div class="card" id="card-m3">
-            <img id="img-m3" src="" alt="Carregando Máquina 3..." class="status-img">
-            <div class="card-content">
-                <h3 class="machine-title">MÁQUINA 3 <span id="badge-m3" class="badge unknown">...</span></h3>
-                <div class="timestamp-container">
-                    <span class="ts-label">ÚLTIMA ATUALIZAÇÃO</span>
-                    <span id="time-m3" class="ts-value">--/--/---- --:--:--</span>
-                </div>
-                <button class="btn-history" onclick="window.location.href='historico.html'">Ver Histórico</button>
-            </div>
-        </div>
-
-        <div class="card" id="card-m4">
-            <img id="img-m4" src="" alt="Carregando Máquina 4..." class="status-img">
-            <div class="card-content">
-                <h3 class="machine-title">MÁQUINA 4 <span id="badge-m4" class="badge unknown">...</span></h3>
-                <div class="timestamp-container">
-                    <span class="ts-label">ÚLTIMA ATUALIZAÇÃO</span>
-                    <span id="time-m4" class="ts-value">--/--/---- --:--:--</span>
-                </div>
-                <button class="btn-history" onclick="window.location.href='historico.html'">Ver Histórico</button>
-            </div>
-        </div>
+    <div class="machine-grid" id="machineGrid">
+        <!-- Cartões de câmeras serão injetados dinamicamente via Javascript -->
     </div>
 
     <script>
-        // Configurações das Câmeras
-        const maquinas = [
-            { id: "m3", cameraID: "689202d8f0e7455499601cf0" },
-            { id: "m4", cameraID: "6814d7d7272a9e45300f8252" }
-        ];
+        // 1. Verificação de Segurança OBRIGATÓRIA
+        const token = sessionStorage.getItem('tandera_token');
+        const userServerIp = sessionStorage.getItem('tandera_serverIp');
 
-        // URL SEGURA COM SSL E SUBDOMÍNIO
-        const baseURL = "https://api.tanderatech.com.br:3000";
+        if (!token || !userServerIp) {
+            // Se não tem login válido salvo, joga para o login
+            window.location.replace('index.html');
+        }
+
+        function fazerLogout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        const baseURL = userServerIp;
+        let maquinas = [];
+
+        // SISTEMA DE SEGURANÇA (OBFUSCAÇÃO)
+        const CHAVE_SECRETA = token.substring(token.length - 12);
+
+        function xorCipherE(text) {
+            let res = '';
+            for (let i = 0; i < text.length; i++) {
+                res += String.fromCharCode(text.charCodeAt(i) ^ CHAVE_SECRETA.charCodeAt(i % CHAVE_SECRETA.length));
+            }
+            return btoa(encodeURIComponent(res));
+        }
+
+        function xorCipherD(hash) {
+            const decoded = decodeURIComponent(atob(hash));
+            let res = '';
+            for (let i = 0; i < decoded.length; i++) {
+                res += String.fromCharCode(decoded.charCodeAt(i) ^ CHAVE_SECRETA.charCodeAt(i % CHAVE_SECRETA.length));
+            }
+            return res;
+        }
+
+        async function carregarCameras() {
+            const cacheRaw = sessionStorage.getItem('tandera_cameras');
+            const dataTimestamp = sessionStorage.getItem('tandera_cameras_ts');
+            const timeLimit = 60 * 1000; // Rate Limit = 1 Minuto
+
+            if (cacheRaw && dataTimestamp && (Date.now() - parseInt(dataTimestamp)) < timeLimit) {
+                try {
+                    maquinas = JSON.parse(xorCipherD(cacheRaw));
+                    return true;
+                } catch (e) { console.log("Lendo dados novos..."); }
+            }
+
+            try {
+                const response = await fetch(`${baseURL}/cameras`);
+                if (!response.ok) throw new Error("Erro de rede.");
+                maquinas = await response.json();
+
+                sessionStorage.setItem('tandera_cameras', xorCipherE(JSON.stringify(maquinas)));
+                sessionStorage.setItem('tandera_cameras_ts', Date.now().toString());
+                return true;
+            } catch (error) {
+                console.error("Falha ao puxar câmeras:", error);
+                document.getElementById('machineGrid').innerHTML = '<h3 style="color:red; text-align:center;">Não foi possível carregar as máquinas.</h3>';
+                return false;
+            }
+        }
+
+        function renderizarGrid() {
+            const grid = document.getElementById('machineGrid');
+            grid.innerHTML = '';
+
+            maquinas.forEach(maquina => {
+                // A API externa retorna o JSON com "_id" e "name"
+                const cID = maquina._id;
+                const htmlId = `maq-${cID}`; // ID único pra não ter espaço
+
+                grid.innerHTML += `
+                    <div class="card" id="card-${htmlId}">
+                        <img id="img-${htmlId}" src="" alt="Carregando Câmera..." class="status-img">
+                        <div class="card-content">
+                            <h3 class="machine-title">${maquina.name.toUpperCase()} <span id="badge-${htmlId}" class="badge unknown">...</span></h3>
+                            <div class="timestamp-container">
+                                <span class="ts-label">ÚLTIMA ATUALIZAÇÃO</span>
+                                <span id="time-${htmlId}" class="ts-value">--/--/---- --:--:--</span>
+                            </div>
+                            <button class="btn-history" onclick="window.location.href='historico.html?camera=${cID}&name=${encodeURIComponent(maquina.name)}'">Ver Histórico</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
         async function fetchMachineData(maquina) {
             try {
-                const infoURL = `${baseURL}/blocks/camera/${maquina.cameraID}/latest`;
-                const imageURL = `${baseURL}/debug-info/image/${maquina.cameraID}`;
+                const cID = maquina._id;
+                const htmlId = `maq-${cID}`;
 
-                // 1. Busca Dados (Agora direto via HTTPS)
+                const infoURL = `${baseURL}/blocks/camera/${cID}/latest`;
+                const imageURL = `${baseURL}/debug-info/image/${cID}`;
+
                 const response = await fetch(infoURL);
                 if (!response.ok) throw new Error('Erro na API');
                 const data = await response.json();
 
-                // 2. Atualiza Imagem
-                const imgElement = document.getElementById(`img-${maquina.id}`);
+                const imgElement = document.getElementById(`img-${htmlId}`);
                 imgElement.src = `${imageURL}?t=${new Date().getTime()}`;
 
-                // 3. Atualiza Textos
-                document.getElementById(`time-${maquina.id}`).innerText = new Date(data.updated).toLocaleString('pt-BR');
+                document.getElementById(`time-${htmlId}`).innerText = new Date(data.updated).toLocaleString('pt-BR');
 
-                const badge = document.getElementById(`badge-${maquina.id}`);
+                const badge = document.getElementById(`badge-${htmlId}`);
                 const label = data.inferedLabel;
                 const conf = (data.confidance * 100).toFixed(1);
 
                 if (label === "Good" || label === "OK") {
-                    badge.innerText = `BOM (${conf}%)`; 
+                    badge.innerText = `BOM (${conf}%)`;
                     badge.className = "badge good";
                 } else if (label === "Unknown") {
-                    badge.innerText = `INCERTO (${conf}%)`; 
+                    badge.innerText = `INCERTO (${conf}%)`;
                     badge.className = "badge unknown";
                 } else {
-                    badge.innerText = `RUIM (${conf}%)`; 
+                    badge.innerText = `RUIM (${conf}%)`;
                     badge.className = "badge bad";
                 }
 
             } catch (error) {
-                console.error(`Erro na Máquina ${maquina.id}:`, error);
-                document.getElementById(`time-${maquina.id}`).innerText = "Servidor Indisponível";
+                console.error(`Erro na Máquina ${maquina.name}:`, error);
+                const htmlId = `maq-${maquina._id}`;
+                document.getElementById(`time-${htmlId}`).innerText = "Servidor Indisponível";
             }
         }
 
         function atualizarTudo() {
-            maquinas.forEach(fetchMachineData);
+            maquinas.forEach(m => fetchMachineData(m));
         }
 
-        atualizarTudo();
-        setInterval(atualizarTudo, 20000); // Atualiza a cada 20 segundos
+        async function bootTandera() {
+            const sucesso = await carregarCameras();
+            if (sucesso && maquinas.length > 0) {
+                renderizarGrid();
+                atualizarTudo();
+                setInterval(atualizarTudo, 30000);
+            }
+        }
+
+        window.onload = bootTandera;
     </script>
 </body>
+
 </html>

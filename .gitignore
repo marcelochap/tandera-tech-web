@@ -1,0 +1,34 @@
+# Tandera Frontend - .gitignore
+
+# Dependências (raiz + backend)
+node_modules/
+backend/node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Variáveis de ambiente (NUNCA versionar - configurar na Vercel Dashboard)
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# Artefatos de build
+dist/
+build/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+
+# IDEs e editores
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Cobertura de testes
+coverage/
