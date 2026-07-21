@@ -6,8 +6,8 @@ const path = require('path');
 // Carrega variáveis de ambiente do backend
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
+const MONGO_URI_FALLBACK = process.env.MONGO_URI_FALLBACK || 'mongodb://localhost:27017/tanderaauth';
 const MONGO_URI_ENV = process.env.MONGO_URI;
-const MONGO_URI_FALLBACK = 'mongodb://Vercel-Admin-tandera-web-db:0zqOacTH1rToS2Af@ac-gsm1pqc-shard-00-00.9tneuya.mongodb.net:27017,ac-gsm1pqc-shard-00-01.9tneuya.mongodb.net:27017,ac-gsm1pqc-shard-00-02.9tneuya.mongodb.net:27017/test?ssl=true&replicaSet=atlas-yv2rrz-shard-0&authSource=admin&retryWrites=true&w=majority';
 
 async function addUser() {
     try {
