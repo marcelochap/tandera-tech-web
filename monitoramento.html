@@ -344,13 +344,32 @@
 
         const AUTH_API = '/api/auth/servers';
 
+        function deduplicarServidores(lista) {
+            const mapa = new Map();
+            for (const item of lista) {
+                if (!item || !item.serverIp) continue;
+                const cleanIp = item.serverIp.trim().replace(/\/+$/, '');
+
+                if (!mapa.has(cleanIp)) {
+                    mapa.set(cleanIp, { ...item, serverIp: cleanIp });
+                } else {
+                    const existente = mapa.get(cleanIp);
+                    const isGenericName = (name) => /google|administrador|local|agent/i.test(name || '');
+                    if (isGenericName(existente.name) && !isGenericName(item.name)) {
+                        mapa.set(cleanIp, { ...item, serverIp: cleanIp });
+                    }
+                }
+            }
+            return Array.from(mapa.values());
+        }
+
         async function obterListaServidores() {
             try {
                 const response = await fetch(AUTH_API);
                 if (response.ok) {
                     const data = await response.json();
                     if (Array.isArray(data) && data.length > 0) {
-                        return data;
+                        return deduplicarServidores(data);
                     }
                 }
             } catch (err) {

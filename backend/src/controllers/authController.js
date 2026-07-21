@@ -107,7 +107,37 @@ exports.defaultLogin = async (req, res) => {
 exports.getServers = async (req, res) => {
     try {
         const users = await User.find({}, 'name email serverIp').lean();
-        res.json(users);
+
+        // Agrupa por serverIp único para não duplicar visualizações de um mesmo servidor
+        const serversMap = new Map();
+
+        for (const user of users) {
+            if (!user.serverIp) continue;
+            const cleanIp = user.serverIp.trim().replace(/\/+$/, '');
+
+            if (!serversMap.has(cleanIp)) {
+                serversMap.set(cleanIp, {
+                    name: user.name,
+                    email: user.email,
+                    serverIp: cleanIp
+                });
+            } else {
+                // Dar preferência ao nome de cliente específico caso o registro existente seja um nome genérico de administrador ou teste
+                const existing = serversMap.get(cleanIp);
+                const isGenericName = (name) => /google|administrador|local|agent/i.test(name);
+                
+                if (isGenericName(existing.name) && !isGenericName(user.name)) {
+                    serversMap.set(cleanIp, {
+                        name: user.name,
+                        email: user.email,
+                        serverIp: cleanIp
+                    });
+                }
+            }
+        }
+
+        const uniqueServers = Array.from(serversMap.values());
+        res.json(uniqueServers);
     } catch (error) {
         console.error('Erro ao listar servidores:', error);
         res.status(500).json({ message: 'Erro ao carregar lista de servidores.' });
