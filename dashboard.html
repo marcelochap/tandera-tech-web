@@ -65,7 +65,7 @@
             font-weight: bold;
             font-size: 0.85rem;
             text-decoration: none;
-            display: flex;
+            display: none; /* Alterado de flex para none por padrão */
             align-items: center;
             gap: 5px;
         }
@@ -183,7 +183,7 @@
 <body>
 
     <div class="header">
-        <button class="btn-monitor" onclick="window.location.href='monitoramento.html'">📷 Monitorar Câmeras</button>
+        <button id="btnMonitor" class="btn-monitor" onclick="window.location.href='monitoramento.html'">📷 Monitorar Câmeras</button>
         <button class="btn-logout" onclick="fazerLogout()">SAIR</button>
         <h2>Tandera Tech</h2>
     </div>
@@ -200,6 +200,24 @@
         if (!token || !userServerIp) {
             // Se não tem login válido salvo, joga para o login
             window.location.replace('index.html');
+        }
+
+        // Função auxiliar para extrair e-mail do token JWT caso não esteja no sessionStorage
+        function obterEmailDoToken(jwtToken) {
+            try {
+                const payloadBase64 = jwtToken.split('.')[1];
+                const decodificado = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+                const payload = JSON.parse(decodeURIComponent(escape(decodificado)));
+                return payload.email ? payload.email.toLowerCase() : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Mostrar o botão monitorar cameras apenas para o gestor
+        const userEmail = sessionStorage.getItem('tandera_email') || obterEmailDoToken(token);
+        if (userEmail && userEmail.toLowerCase() === 'marcelo.leite.engcivil@gmail.com') {
+            document.getElementById('btnMonitor').style.display = 'flex';
         }
 
         function fazerLogout() {

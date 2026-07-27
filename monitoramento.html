@@ -337,6 +337,25 @@
             window.location.replace('index.html');
         }
 
+        // Função auxiliar para extrair e-mail do token JWT caso não esteja no sessionStorage
+        function obterEmailDoToken(jwtToken) {
+            try {
+                const payloadBase64 = jwtToken.split('.')[1];
+                const decodificado = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+                const payload = JSON.parse(decodeURIComponent(escape(decodificado)));
+                return payload.email ? payload.email.toLowerCase() : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Bloquear acesso a usuários que não sejam o gestor
+        const userEmail = sessionStorage.getItem('tandera_email') || obterEmailDoToken(token);
+        if (!userEmail || userEmail.toLowerCase() !== 'marcelo.leite.engcivil@gmail.com') {
+            alert('Acesso negado: esta página é restrita para o gestor.');
+            window.location.replace('dashboard.html');
+        }
+
         function fazerLogout() {
             sessionStorage.clear();
             window.location.href = 'index.html';

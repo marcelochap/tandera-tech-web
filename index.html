@@ -164,9 +164,10 @@
         async function processLoginResponse(response) {
             if (response.ok) {
                 const data = await response.json();
-                // Salvar Token e IP do servidor específicos do usuário no Storage da Sessão
+                // Salvar Token, e-mail e IP do servidor específicos do usuário no Storage da Sessão
                 sessionStorage.setItem('tandera_token', data.token);
                 sessionStorage.setItem('tandera_serverIp', data.user.serverIp);
+                sessionStorage.setItem('tandera_email', data.user.email);
                 window.location.href = 'dashboard.html';
             } else {
                 const error = await response.json();
