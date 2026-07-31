@@ -483,7 +483,7 @@
                                 <span class="client-name">${clientName}</span>
                             </div>
                             <div class="image-container" id="img-container-${htmlId}">
-                                <img id="img-${htmlId}" src="${serverIp}/debug-info/image/${cID}?t=${Date.now()}" 
+                                <img id="img-${htmlId}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
                                      alt="${cameraName}" 
                                      class="camera-img"
                                      onerror="lidarComErroImagem(this, '${clientName}', '${cameraName}')">
@@ -504,7 +504,7 @@
                     gridElement.innerHTML += cardHTML;
 
                     // Busca o último status/detecção da câmera assincronamente
-                    fetchUltimaInferencia(serverIp, cID, htmlId);
+                    fetchUltimaInferencia(serverIp, cID, htmlId, clientName, cameraName);
                 }
 
             } catch (err) {
@@ -518,12 +518,20 @@
             }
         }
 
-        async function fetchUltimaInferencia(serverIp, cID, htmlId) {
+        async function fetchUltimaInferencia(serverIp, cID, htmlId, clientName, cameraName) {
             try {
                 const infoURL = `${serverIp}/blocks/camera/${cID}/latest`;
                 const response = await fetch(infoURL);
                 if (!response.ok) throw new Error("Erro na requisição da inferência");
                 const data = await response.json();
+
+                const blockId = data._id || data.id;
+                if (!blockId) throw new Error("ID do bloco não encontrado");
+
+                const imgElem = document.getElementById(`img-${htmlId}`);
+                if (imgElem) {
+                    imgElem.src = `${serverIp}/blocks/${blockId}/image?t=${Date.now()}`;
+                }
 
                 const timeElem = document.getElementById(`time-${htmlId}`);
                 if (timeElem && data.updated) {
@@ -558,6 +566,10 @@
                 const timeElem = document.getElementById(`time-${htmlId}`);
                 if (timeElem) {
                     timeElem.innerText = 'Servidor Indisponível';
+                }
+                const imgElem = document.getElementById(`img-${htmlId}`);
+                if (imgElem) {
+                    lidarComErroImagem(imgElem, clientName, cameraName);
                 }
             }
         }

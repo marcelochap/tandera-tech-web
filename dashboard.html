@@ -306,11 +306,15 @@
                 const htmlId = `maq-${cID}`;
 
                 const infoURL = `${baseURL}/blocks/camera/${cID}/latest`;
-                const imageURL = `${baseURL}/debug-info/image/${cID}`;
 
                 const response = await fetch(infoURL);
                 if (!response.ok) throw new Error('Erro na API');
                 const data = await response.json();
+
+                const blockId = data._id || data.id;
+                if (!blockId) throw new Error('ID do bloco não encontrado');
+
+                const imageURL = `${baseURL}/blocks/${blockId}/image`;
 
                 const imgElement = document.getElementById(`img-${htmlId}`);
                 imgElement.src = `${imageURL}?t=${new Date().getTime()}`;
