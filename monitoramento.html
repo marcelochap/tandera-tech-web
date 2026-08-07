@@ -349,10 +349,11 @@
             }
         }
 
-        // Bloquear acesso a usuários que não sejam o gestor
+        // Bloquear acesso a usuários que não sejam autorizados a monitorar
         const userEmail = sessionStorage.getItem('tandera_email') || obterEmailDoToken(token);
-        if (!userEmail || userEmail.toLowerCase() !== 'marcelo.leite.engcivil@gmail.com') {
-            alert('Acesso negado: esta página é restrita para o gestor.');
+        const allowedEmails = ['marcelo.leite.engcivil@gmail.com', 'cristianoaraujo.engenheiro@gmail.com'];
+        if (!userEmail || !allowedEmails.includes(userEmail.toLowerCase())) {
+            alert('Acesso negado: esta página é restrita.');
             window.location.replace('dashboard.html');
         }
 

@@ -214,9 +214,10 @@
             }
         }
 
-        // Mostrar o botão monitorar cameras apenas para o gestor
+        // Mostrar o botão monitorar cameras apenas para o gestor e usuários autorizados
         const userEmail = sessionStorage.getItem('tandera_email') || obterEmailDoToken(token);
-        if (userEmail && userEmail.toLowerCase() === 'marcelo.leite.engcivil@gmail.com') {
+        const allowedEmails = ['marcelo.leite.engcivil@gmail.com', 'cristianoaraujo.engenheiro@gmail.com'];
+        if (userEmail && allowedEmails.includes(userEmail.toLowerCase())) {
             document.getElementById('btnMonitor').style.display = 'flex';
         }
 

@@ -18,10 +18,10 @@ async function addUser() {
         console.log('Conectado com sucesso!');
 
         const userData = {
-            email: 'rogerio@ademardobloco.com.br',
-            passwordHash: 'TanderaAdemar@2026', 
-            name: 'Rogerio - Ademar',
-            serverIp: 'https://ademar.tanderatech.com.br:3000'
+            email: 'cristianoaraujo.engenheiro@gmail.com',
+            passwordHash: 'TanderaPremoldado@2026', 
+            name: 'Cristiano - Premoldado',
+            serverIp: 'https://api.tanderatech.com.br:3000'
         };
 
         // Verifica se já existe
